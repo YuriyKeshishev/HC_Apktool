@@ -80,10 +80,20 @@ public class ApkDecoder {
             throw new OutDirExistsException();
         }
 
-        if (!mApkFile.isFile() || !mApkFile.canRead()) {
-            throw new InFileNotFoundException();
-        }
-
+//        if (!mApkFile.isFile() || !mApkFile.canRead()) {
+//            throw new InFileNotFoundException();
+//        }
+		
+	if (mApkFile.isFile() && mApkFile.canRead()) {
+		mInputDirectoryMode = false;
+	}
+	else if (mApkFile.isDirectory() && mApkFile.exists()) {
+		mInputDirectoryMode = true;
+	}
+	else {
+		throw new InFileNotFoundException();
+	}
+ 
         try {
             OS.rmdir(outDir);
         } catch (BrutException ex) {
@@ -91,8 +101,10 @@ public class ApkDecoder {
         }
         outDir.mkdirs();
 
-        LOGGER.info("Using Apktool " + Androlib.getVersion() + " on " + mApkFile.getName());
+//        LOGGER.info("Using Apktool " + Androlib.getVersion() + " on " + mApkFile.getName());
 
+        LOGGER.info("Using Apktool " + Androlib.getVersion() + " on " + mApkFile.getName() + (mInputDirectoryMode ? " (directory)" : ""));
+ 
         if (hasResources()) {
             switch (mDecodeResources) {
                 case DECODE_RESOURCES_NONE:
@@ -393,4 +405,6 @@ public class ApkDecoder {
     private Collection<String> mUncompressedFiles;
     private boolean mAnalysisMode = false;
     private int mApi = 15;
+    // Rus
+    private boolean mInputDirectoryMode = false;
 }
